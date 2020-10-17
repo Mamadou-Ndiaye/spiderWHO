@@ -5,7 +5,11 @@
 
 
 # useful for handling different item types with a single interface
-import sqlite3
+#import sqlite3
+
+import  mysql.connector
+
+
 
 from itemadapter import ItemAdapter
 
@@ -17,8 +21,15 @@ class SpiderwhoPipeline:
 
 
     def create_connection(self):
-        conn = sqlite3.connect('myquotes.db')
+        conn = mysql.connector.connect(
+                    host='localhost',
+                    user='admin',
+                    password='openopen',
+                    database='dbwho'
+        )
         curs = conn.cursor()
+        curs.execute("CREATE DATABASE my_db")
+        print("------------------connect successful!!!------------------------------")
 
     def create_table(self):
         self.curs.execute("DROP TABLE IF EXISTS quotes_tb")
@@ -34,8 +45,10 @@ class SpiderwhoPipeline:
         return item
 
     def store_db(self, item):
-          self.curs.execute(''' insert into quotes_tb values (%s, %s, %s)''',(
+          self.curs.execute(''' insert into quotes_tb values (%s, %s)''',(
               item['question'][0],
               item['response'][0]
           ))
           self.conn.commit()
+
+
