@@ -12,43 +12,20 @@ import  mysql.connector
 
 
 from itemadapter import ItemAdapter
-
+import  pymongo
 
 class SpiderwhoPipeline:
+
     def __init__(self):
-        self.create_connection()
-        self.create_table()
-
-
-    def create_connection(self):
-        conn = mysql.connector.connect(
-                    host='localhost',
-                    user='admin',
-                    password='openopen',
-                    database='dbwho'
+        self.conn = pymongo.MongoClient(
+                    'localhost',
+                    27017
         )
-        curs = conn.cursor()
-        curs.execute("CREATE DATABASE my_db")
-        print("------------------connect successful!!!------------------------------")
+        db = self.conn['dbwho']
+        self.collection=db['who_tb']
 
-    def create_table(self):
-        self.curs.execute("DROP TABLE IF EXISTS quotes_tb")
-
-        self.sql=''' create table quotes_tb(
-                         title text,
-                         author text,
-                         tag text) '''
-        self.curs.execute(self.sql)
 
     def process_item(self, item, spider):
-        self.store_db(item)
+        self.collection.insert(dict(item))
         return item
-
-    def store_db(self, item):
-          self.curs.execute(''' insert into quotes_tb values (%s, %s)''',(
-              item['question'][0],
-              item['response'][0]
-          ))
-          self.conn.commit()
-
 
